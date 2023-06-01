@@ -14,7 +14,7 @@ GITHUB_TOKEN            # GitHub personal access token
 MONITORING_PROJECT      # Google project containing the Cloud Pub/Sub topic to post alerts to
 OVER_LICENSED_THRESHOLD # If the number of available licences is equal to or greater than this threshold then an additional message is displayed
 SLACK_ALERTS_CHANNEL    # Name of the Slack channel to post alerts to
-SLACK_PUBSUB_TOPIC      # The name of the Cloud Pub/Sub topic to post alerts to
+SLACK_PUBSUB_TOPIC      # Name of the Cloud Pub/Sub topic to post alerts to
 UNDER_LICENSED_THRESOLD # If the number of available licences is equal to or less than this threshold then an additional message is displayed
 ```
 
