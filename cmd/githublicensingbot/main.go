@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/ONSdigital/github-licensing-bot/pkg/github"
 	"github.com/ONSdigital/github-licensing-bot/pkg/slack"
 )
@@ -21,6 +24,11 @@ func main() {
 		log.Fatal("Missing GITHUB_TOKEN environmental variable")
 	}
 
+	monitoringProject := ""
+	if monitoringProject = os.Getenv("MONITORING_PROJECT"); len(monitoringProject) == 0 {
+		log.Fatal("Missing MONITORING_PROJECT environment variable")
+	}
+
 	overLicensedThreshold := ""
 	if overLicensedThreshold = os.Getenv("OVER_LICENSED_THRESHOLD"); len(overLicensedThreshold) == 0 {
 		log.Fatal("Missing OVER_LICENSED_THRESHOLD environment variable")
@@ -31,9 +39,9 @@ func main() {
 		log.Fatal("Missing SLACK_ALERTS_CHANNEL environment variable")
 	}
 
-	slackWebHookURL := ""
-	if slackWebHookURL = os.Getenv("SLACK_WEBHOOK"); len(slackWebHookURL) == 0 {
-		log.Fatal("Missing SLACK_WEBHOOK environment variable")
+	slackPubSubTopic := ""
+	if slackPubSubTopic = os.Getenv("SLACK_PUBSUB_TOPIC"); len(slackPubSubTopic) == 0 {
+		log.Fatal("Missing SLACK_PUBSUB_TOPIC environment variable")
 	}
 
 	underLicensedThreshold := ""
@@ -60,19 +68,38 @@ func main() {
 		text = fmt.Sprintf("%s\nWe may be over-licensed.", text)
 	}
 
-	postSlackMessage(text, slackAlertsChannel, slackWebHookURL)
+	postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTopic)
 }
 
-func postSlackMessage(text, channel, webHookURL string) {
+func postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTopic string) {
+	ctx := context.Background()
+	client, err := pubsub.NewClient(ctx, monitoringProject)
+	if err != nil {
+		log.Fatalf("Failed to create Pub/Sub client: %v", err)
+	}
+
+	topic := client.Topic(slackPubSubTopic)
+
 	payload := slack.Payload{
 		Text:      text,
 		Username:  "GitHub Licensing Bot",
-		Channel:   channel,
+		Channel:   slackAlertsChannel,
 		IconEmoji: ":github:",
 	}
 
-	err := slack.Send(webHookURL, payload)
+	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		log.Fatalf("Failed to send Slack message: %v", err)
+		log.Fatalf("Failed to serialise Slack message payload into JSON: %v", err)
 	}
+
+	result := topic.Publish(ctx, &pubsub.Message{
+		Data: []byte(jsonPayload),
+	})
+
+	messageID, err := result.Get(ctx)
+	if err != nil {
+		log.Fatalf("Failed to publish Pub/Sub message: %v", err)
+	}
+
+	log.Printf("Published Pub/Sub message with message ID: %s", messageID)
 }
