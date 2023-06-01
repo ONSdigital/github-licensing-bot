@@ -96,10 +96,8 @@ func postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTo
 		Data: []byte(jsonPayload),
 	})
 
-	messageID, err := result.Get(ctx)
+	_, err = result.Get(ctx)
 	if err != nil {
 		log.Fatalf("Failed to publish Pub/Sub message: %v", err)
 	}
-
-	log.Printf("Published Pub/Sub message with message ID: %s", messageID)
 }
