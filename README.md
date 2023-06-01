@@ -9,6 +9,7 @@ Use `make` to compile binaries for macOS and Linux.
 The environment variables below are required:
 
 ```
+GITHUB_API_BASE_URI     # URI of GitHub's GraphQL API host
 GITHUB_ENTERPRISE_NAME  # Name of the GitHub Enterprise
 GITHUB_TOKEN            # GitHub personal access token
 MONITORING_PROJECT      # Google project containing the Cloud Pub/Sub topic to post alerts to
