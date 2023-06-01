@@ -1,11 +1,5 @@
 package slack
 
-import (
-	"fmt"
-
-	"github.com/parnurzeal/gorequest"
-)
-
 // Field represents a Slack message field.
 type Field struct {
 	Title string `json:"title"`
@@ -56,35 +50,4 @@ type Payload struct {
 	UnfurlLinks bool         `json:"unfurl_links,omitempty"`
 	UnfurlMedia bool         `json:"unfurl_media,omitempty"`
 	Markdown    bool         `json:"mrkdwn,omitempty"`
-}
-
-// AddAction adds the passed Slack message action to a Slack message attachment.
-func (attachment *Attachment) AddAction(action Action) *Attachment {
-	attachment.Actions = append(attachment.Actions, &action)
-	return attachment
-}
-
-// AddField adds the passed Slack message field to a Slack message attachment.
-func (attachment *Attachment) AddField(field Field) *Attachment {
-	attachment.Fields = append(attachment.Fields, &field)
-	return attachment
-}
-
-func redirectPolicyFunc(req gorequest.Request, via []gorequest.Request) error {
-	return fmt.Errorf("Incorrect token (redirection)")
-}
-
-// Send POSTS the passed payload to the passed Slack webhook URL.
-func Send(webHookURL string, payload Payload) []error {
-	request := gorequest.New()
-	resp, _, err := request.Post(webHookURL).RedirectPolicy(redirectPolicyFunc).Send(payload).End()
-
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode >= 400 {
-		return []error{fmt.Errorf("Error sending message: %v", resp.Status)}
-	}
-
-	return nil
 }
