@@ -14,6 +14,11 @@ import (
 )
 
 func main() {
+	apiBase := ""
+	if apiBase = os.Getenv("GITHUB_API_BASE_URI"); len(apiBase) == 0 {
+		log.Fatal("Missing GITHUB_API_BASE_URI environment variable")
+	}
+
 	enterprise := ""
 	if enterprise = os.Getenv("GITHUB_ENTERPRISE_NAME"); len(enterprise) == 0 {
 		log.Fatal("Missing GITHUB_ENTERPRISE_NAME environmental variable")
@@ -49,7 +54,7 @@ func main() {
 		log.Fatal("Missing UNDER_LICENSED_THRESHOLD environment variable")
 	}
 
-	client := github.NewClient(token)
+	client := github.NewClient(apiBase, token)
 	data, err := client.GetEnterpriseLicensing(enterprise)
 	if err != nil {
 		log.Fatalf("Failed to fetch licensing: %v", err)

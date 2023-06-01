@@ -10,18 +10,18 @@ type (
 
 	// Client wraps a GraphQL client for communicating with the GitHub API.
 	Client struct {
-		token  string
-		client *graphql.Client
+		apiBase string
+		token   string
+		client  *graphql.Client
 	}
 )
 
-const endpoint = "https://api.github.com/graphql"
-
 // NewClient instantiates a new GraphQL client.
-func NewClient(token string) *Client {
+func NewClient(apiBase, token string) *Client {
 	return &Client{
-		token:  token,
-		client: graphql.NewClient(endpoint),
+		apiBase: apiBase,
+		token:   token,
+		client:  graphql.NewClient(apiBase + "/graphql"),
 	}
 }
 
