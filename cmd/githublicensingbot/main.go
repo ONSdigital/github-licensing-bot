@@ -77,8 +77,8 @@ func main() {
 }
 
 func postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTopic string) {
-	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, monitoringProject)
+	context := context.Background()
+	client, err := pubsub.NewClient(context, monitoringProject)
 	if err != nil {
 		log.Fatalf("Failed to create Pub/Sub client: %v", err)
 	}
@@ -97,11 +97,11 @@ func postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTo
 		log.Fatalf("Failed to serialise Slack message payload into JSON: %v", err)
 	}
 
-	result := topic.Publish(ctx, &pubsub.Message{
+	result := topic.Publish(context, &pubsub.Message{
 		Data: []byte(jsonPayload),
 	})
 
-	_, err = result.Get(ctx)
+	_, err = result.Get(context)
 	if err != nil {
 		log.Fatalf("Failed to publish Pub/Sub message: %v", err)
 	}
