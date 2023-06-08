@@ -68,7 +68,7 @@ func main() {
 	totalAvailableLicences := data.Enterprise.BillingInfo.TotalAvailableLicenses
 	totalLicences := data.Enterprise.BillingInfo.TotalLicenses
 	licencesUsed := totalLicences - totalAvailableLicences
-	text := fmt.Sprintf("*%s* is using *%d* out of *%d* total GitHub licences available.", system, licencesUsed, totalAvailableLicences)
+	text := fmt.Sprintf("*%s* is using *%d* out of *%d* total GitHub licences available.", system, licencesUsed, totalLicences)
 
 	underLicensedThresholdCount, _ := strconv.Atoi(underLicensedThreshold)
 	overLicensedThresholdCount, _ := strconv.Atoi(overLicensedThreshold)
