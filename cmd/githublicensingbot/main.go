@@ -49,6 +49,11 @@ func main() {
 		log.Fatal("Missing SLACK_PUBSUB_TOPIC environment variable")
 	}
 
+	system := ""
+	if system = os.Getenv("SYSTEM"); len(system) == 0 {
+		log.Fatal("Missing SYSTEM environment variable")
+	}
+
 	underLicensedThreshold := ""
 	if underLicensedThreshold = os.Getenv("UNDER_LICENSED_THRESHOLD"); len(underLicensedThreshold) == 0 {
 		log.Fatal("Missing UNDER_LICENSED_THRESHOLD environment variable")
@@ -62,7 +67,8 @@ func main() {
 
 	totalAvailableLicences := data.Enterprise.BillingInfo.TotalAvailableLicenses
 	totalLicences := data.Enterprise.BillingInfo.TotalLicenses
-	text := fmt.Sprintf("There are *%d* out of *%d* total GitHub licences available.", totalAvailableLicences, totalLicences)
+	licencesUsed := totalLicences - totalAvailableLicences
+	text := fmt.Sprintf("*%s* is using *%d* out of *%d* total GitHub licences available.", system, licencesUsed, totalAvailableLicences)
 
 	underLicensedThresholdCount, _ := strconv.Atoi(underLicensedThreshold)
 	overLicensedThresholdCount, _ := strconv.Atoi(overLicensedThreshold)
