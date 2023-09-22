@@ -69,6 +69,9 @@ func main() {
 	licencesUsed := totalLicences - totalAvailableLicences
 	text := fmt.Sprintf("*%s* is using *%d* out of *%d* total GitHub licences available.", system, licencesUsed, totalLicences)
 
+	stdoutLogger := log.New(os.Stdout, "", log.LstdFlags)
+	stdoutLogger.Println(text)
+
 	postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTopic)
 }
 
