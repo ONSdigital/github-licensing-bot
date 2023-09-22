@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/ONSdigital/github-licensing-bot/pkg/github"
@@ -69,15 +68,6 @@ func main() {
 	totalLicences := data.Enterprise.BillingInfo.TotalLicenses
 	licencesUsed := totalLicences - totalAvailableLicences
 	text := fmt.Sprintf("*%s* is using *%d* out of *%d* total GitHub licences available.", system, licencesUsed, totalLicences)
-
-	underLicensedThresholdCount, _ := strconv.Atoi(underLicensedThreshold)
-	overLicensedThresholdCount, _ := strconv.Atoi(overLicensedThreshold)
-
-	if totalAvailableLicences <= underLicensedThresholdCount {
-		text = fmt.Sprintf("%s\nTime to order some more?", text)
-	} else if totalAvailableLicences >= overLicensedThresholdCount {
-		text = fmt.Sprintf("%s\nWe may be over-licensed.", text)
-	}
 
 	postSlackMessage(text, monitoringProject, slackAlertsChannel, slackPubSubTopic)
 }
